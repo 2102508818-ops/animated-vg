@@ -15,7 +15,7 @@ export const useEditorStore = defineStore('editor', {
     _idCounter: 1,
     undoStack: [],
     redoStack: [],
-    
+
     // Settings
     snapEnabled: false,
     snapSize: 10,
@@ -482,7 +482,6 @@ export const useEditorStore = defineStore('editor', {
       const before = this.xml
       const doc = new DOMParser().parseFromString(this.xml, 'image/svg+xml')
       const el = doc.getElementById(this.selectedId)
-      if (!el || el === doc.documentElement) return // Don't delete root SVG
       const parent = el.parentNode
       parent.removeChild(el)
       this.xml = new XMLSerializer().serializeToString(doc.documentElement)

@@ -13,14 +13,29 @@
 
         <span>{{ prop.node.id }}</span>
         <q-btn
-          v-if="prop.node.id !== 'svg-root' && (!prop.node.children || prop.node.children.length === 0)"
+          v-if="prop.node.id !== 'svg-root' && prop.node.tagName !== 'svg'"
           dense
           flat
           round
-          icon="mdi-delete"
+          icon="eva-more-vertical"
           class="q-ml-auto"
-          @click.stop="deleteNode(prop.node.id)"
-        />
+          :disable="prop.node.id === 'svg-root'"
+        >
+          <q-popup-proxy
+            anchor="bottom right"
+            self="top left"
+            :offset="[0, 4]"
+          >
+            <q-list style="min-width: 100px">
+              <q-item v-if="prop.node.id !== 'svg-root'" clickable @click="() => deleteNode(prop.node.id)">
+                <q-item-section avatar>
+                  <q-icon name="eva-trash-2-outline" />
+                </q-item-section>
+                <q-item-section>Delete</q-item-section>
+              </q-item>
+            </q-list>
+          </q-popup-proxy>
+        </q-btn>
       </template>
     </q-tree>
   </LayoutDrawerApplet>
@@ -30,7 +45,7 @@
 import { computed, ref, watch } from 'vue'
 import LayoutDrawerApplet from 'components/layout/LayoutDrawerApplet.vue'
 import { useEditorStore } from 'src/stores/editor-store.js'
-import { QBtn } from 'quasar'
+import { QBtn, QPopupProxy, QItem, QItemSection, QList, QIcon } from 'quasar'
 
 const editorStore = useEditorStore()
 
@@ -55,7 +70,6 @@ function onTreeSelectionChange(nodeId) {
 }
 
 const deleteNode = (id) => {
-  if (id === 'svg-root') return
   editorStore.setSelectionById(id)
   editorStore.deleteSelected()
 }
