@@ -15,7 +15,7 @@ export const useEditorStore = defineStore('editor', {
     _idCounter: 1,
     undoStack: [],
     redoStack: [],
-    
+
     // Settings
     snapEnabled: false,
     snapSize: 10,
@@ -475,6 +475,23 @@ export const useEditorStore = defineStore('editor', {
       }
       const svg = doc.documentElement
       this.xml = new XMLSerializer().serializeToString(svg)
+    },
+
+    deleteSelected() {
+      if (!this.selectedId) return
+      const before = this.xml
+      const doc = new DOMParser().parseFromString(this.xml, 'image/svg+xml')
+      const el = doc.getElementById(this.selectedId)
+      if (!el) return
+      if (el === doc.documentElement) return // Prevent deleting root SVG
+      const parent = el.parentNode
+      if (!parent) return
+      parent.removeChild(el)
+      this.xml = new XMLSerializer().serializeToString(doc.documentElement)
+      this.json = this._updateJsonFromXml()
+      this.clearSelection()
+      this.undoStack.push(before)
+      this.redoStack = []
     },
     // Grouping
     groupSelected() {
