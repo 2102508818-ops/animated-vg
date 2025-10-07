@@ -482,7 +482,10 @@ export const useEditorStore = defineStore('editor', {
       const before = this.xml
       const doc = new DOMParser().parseFromString(this.xml, 'image/svg+xml')
       const el = doc.getElementById(this.selectedId)
+      if (!el) return
+      if (el === doc.documentElement) return // Prevent deleting root SVG
       const parent = el.parentNode
+      if (!parent) return
       parent.removeChild(el)
       this.xml = new XMLSerializer().serializeToString(doc.documentElement)
       this.json = this._updateJsonFromXml()
